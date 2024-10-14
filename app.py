@@ -1,65 +1,83 @@
+from flask import Flask, render_template
+from flask_socketio import SocketIO, emit
 import yfinance as yf
-import pandas as pd
 import pandas_ta as ta
-import numpy as np
 import time
+import threading
 
-def get_bollinger_percentage(stock_symbol):
+app = Flask(__name__)
+app.config['SECRET_KEY'] = 'your_secret_key'
+socketio = SocketIO(app)
+
+# Step 1: Fetch Stock Data
+def fetch_stock_data(stock_symbols):
     try:
-        # Fetch stock data with a 1-hour interval
-        stock_data_1h = yf.download(stock_symbol, period="1mo", interval="1h")
-
-        if stock_data_1h.empty:
-            print(f"Error: No data fetched for {stock_symbol}")
-            return None
-
-        # Resample to 2-hour intervals
-        stock_data = stock_data_1h.resample('2h').agg({
-            'Open': 'first',  # Take the first value for the open price
-            'High': 'max',    # Take the maximum value for the high price
-            'Low': 'min',     # Take the minimum value for the low price
-            'Close': 'last',  # Take the last value for the close price
-            'Volume': 'sum'   # Sum the volume traded in the 2-hour interval
-        }).dropna()
-
+        # Fetch stock data for all symbols with a 1-hour interval over the last month
+        stock_data = yf.download(stock_symbols, period="1mo", interval="1h", group_by='ticker')
         if stock_data.empty:
-            print(f"Error: No data after resampling for {stock_symbol}")
+            print(f"Error: No data returned for symbols {stock_symbols}")
             return None
-
-        # Calculate the typical price (Open + High + Low + Close) / 4
-        stock_data['OHLC4'] = (stock_data['Open'] + stock_data['High'] + stock_data['Low'] + stock_data['Close']) / 4
-
-        # Calculate Variable Monthly Average (assuming it's an Exponential Moving Average here)
-        # Adjust as per your definition of variable monthly average
-        stock_data['VMA'] = stock_data['OHLC4'].ewm(span=20, adjust=False).mean()
-
-        # Calculate Bollinger Bands using pandas_ta
-        bbands = ta.bbands(stock_data['OHLC4'], length=20, std=2)
-
-        # Merge Bollinger Bands with stock data
-        stock_data = stock_data.join(bbands)
-
-        # Calculate Bollinger %b
-        stock_data['%b'] = ((stock_data['OHLC4'] - stock_data['BBL_20_2.0']) /
-                            (stock_data['BBU_20_2.0'] - stock_data['BBL_20_2.0'])) * 100
-
-        return stock_data['%b'].iloc[-1]  # Return the most recent Bollinger %b
+        return stock_data
     except Exception as e:
-        print(f"An error occurred for {stock_symbol}: {e}")
+        print(f"Error fetching stock data: {e}")
         return None
 
-def check_bollinger_percentage(stock_symbol):
-    bollinger_percentage = get_bollinger_percentage(stock_symbol)
+# Step 2: Calculate Bollinger %b and RSI for a single stock
+def calculate_bollinger_and_rsi(data):
+    try:
+        # Calculate typical price (OHLC4)
+        data['OHLC4'] = (data['Open'] + data['High'] + data['Low'] + data['Close']) / 4
 
-    if bollinger_percentage is not None:
-        print(f"Current Bollinger %b for {stock_symbol}: {bollinger_percentage:.2f}%")
-        if bollinger_percentage < 0:
-            print(f"ALERT: Bollinger %b for {stock_symbol} has dropped below 0%!")
-        elif bollinger_percentage < 5:  # Adjust the threshold as needed
-            print(f"ALERT: Bollinger %b for {stock_symbol} is approaching 0%!")
+        # Calculate Bollinger Bands
+        bbands = ta.bbands(data['OHLC4'], length=20, std=2)
+        data = data.join(bbands)
 
-# List of stock symbols
-stock_symbols = [
+        # Calculate Bollinger %b
+        data['Bollinger_%b'] = ((data['OHLC4'] - data['BBL_20_2.0']) /
+                                (data['BBU_20_2.0'] - data['BBL_20_2.0'])) * 100
+
+        # Calculate RSI (14 period)
+        data['RSI'] = ta.rsi(data['OHLC4'], length=14)
+
+        # Return the last Bollinger %b and RSI values
+        return data['Bollinger_%b'].iloc[-1], data['RSI'].iloc[-1]
+
+    except Exception as e:
+        print(f"Error calculating indicators: {e}")
+        return None, None
+
+# Step 3: Process all stocks and compute indicators
+def process_stock_data(stock_data, stock_symbols):
+    results = {}
+    for symbol in stock_symbols:
+        try:
+            data = stock_data[symbol]
+            bollinger_b, rsi = calculate_bollinger_and_rsi(data)
+            results[symbol] = {
+                'Bollinger_%b': bollinger_b,
+                'RSI': rsi
+            }
+        except Exception as e:
+            print(f"Error processing {symbol}: {e}")
+    return results
+
+# Step 4: Emit alerts based on conditions
+def check_and_emit_alerts(results):
+    for symbol, indicators in results.items():
+        bollinger_b = indicators['Bollinger_%b']
+        rsi = indicators['RSI']
+        print(f"Current Bollinger %b for {symbol}: {bollinger_b:.2f}%, RSI: {rsi:.2f}")
+        
+        if bollinger_b < 0:
+            message = f"ALERT: Bollinger %b for {symbol} has dropped below 0%! RSI: {rsi:.2f}"
+            socketio.emit('new_alert', {'message': message})
+        elif bollinger_b < 10:
+            message = f"ALERT: Bollinger %b for {symbol} is approaching 10%! RSI: {rsi:.2f}"
+            socketio.emit('new_alert', {'message': message})
+
+# Step 5: Main monitoring function
+def monitor_stock_indicators():
+    stock_symbols = [
     'DEEPAKFERT.NS',
     'MRPL.NS',
     'APOLLOTYRE.NS',
@@ -275,9 +293,23 @@ stock_symbols = [
     'TRENT.NS',
 ]
 
-# Check Bollinger Percentage in a loop (e.g., every day)
-while True:
-    for symbol in stock_symbols:
-        check_bollinger_percentage(symbol)
-    # Wait for 24 hours before checking again
-    time.sleep(24 * 60 * 60)
+    
+    while True:
+        stock_data = fetch_stock_data(stock_symbols)
+        if stock_data is not None and not stock_data.empty:
+            results = process_stock_data(stock_data, stock_symbols)
+            check_and_emit_alerts(results)
+        else:
+            print("No valid stock data found, retrying...")
+        time.sleep(60 * 60)  # Wait for 1 hour before checking again
+
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+if __name__ == '__main__':
+    # Run stock monitoring in a separate thread
+    monitor_thread = threading.Thread(target=monitor_stock_indicators)
+    monitor_thread.daemon = True
+    monitor_thread.start()
+    socketio.run(app, host='0.0.0.0', port=5001)
