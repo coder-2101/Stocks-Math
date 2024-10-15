@@ -67,13 +67,22 @@ def check_and_emit_alerts(results):
         bollinger_b = indicators['Bollinger_%b']
         rsi = indicators['RSI']
         print(f"Current Bollinger %b for {symbol}: {bollinger_b:.2f}%, RSI: {rsi:.2f}")
-        
+
+        # Bollinger %b alerts
         if bollinger_b < 0:
-            message = f"ALERT: Bollinger %b for {symbol} has dropped below 0%! RSI: {rsi:.2f}"
-            socketio.emit('new_alert', {'message': message})
+            message = f"ALERT: Bollinger %b for {symbol} has dropped below 0%!"
+            socketio.emit('new_alert', {'message': message, 'type': 'alert'})
         elif bollinger_b < 10:
-            message = f"ALERT: Bollinger %b for {symbol} is approaching 10%! RSI: {rsi:.2f}"
-            socketio.emit('new_alert', {'message': message})
+            message = f"WARNING: Bollinger %b for {symbol} is approaching 10%!"
+            socketio.emit('new_alert', {'message': message, 'type': 'warning'})
+
+        # RSI alerts
+        if rsi < 30:
+            message = f"ALERT: RSI for {symbol} has dropped below 30!"
+            socketio.emit('new_alert', {'message': message, 'type': 'alert'})
+        elif rsi < 40:
+            message = f"WARNING: RSI for {symbol} is approaching 30!"
+            socketio.emit('new_alert', {'message': message, 'type': 'warning'})
 
 # Step 5: Main monitoring function
 def monitor_stock_indicators():
@@ -293,7 +302,7 @@ def monitor_stock_indicators():
     'TRENT.NS',
 ]
 
-    
+
     while True:
         stock_data = fetch_stock_data(stock_symbols)
         if stock_data is not None and not stock_data.empty:
