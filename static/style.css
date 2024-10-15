@@ -38,3 +38,15 @@ body {
 .close-btn:hover {
     color: #bbb;
 }
+/* Add this to your static/style.css */
+#refresh-btn {
+    padding: 10px 20px;
+    font-size: 16px;
+    margin-bottom: 20px;
+    cursor: pointer;
+}
+
+#refresh-btn:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
