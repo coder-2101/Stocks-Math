@@ -1,6 +1,7 @@
 from flask import Flask, render_template
 from flask_socketio import SocketIO, emit
 import yfinance as yf
+import pandas as pd
 import pandas_ta as ta
 import time
 import threading
@@ -12,8 +13,9 @@ socketio = SocketIO(app)
 # Step 1: Fetch Stock Data
 def fetch_stock_data(stock_symbols):
     try:
-        # Fetch stock data for all symbols with a 1-hour interval over the last month
-        stock_data = yf.download(stock_symbols, period="1mo", interval="1h", group_by='ticker')
+        # Fetch stock data for all symbols with a 1-hour interval over the last 3 months
+        stock_data = yf.download(stock_symbols, period="3mo", interval="1h", group_by='ticker', threads=True)
+
         if stock_data.empty:
             print(f"Error: No data returned for symbols {stock_symbols}")
             return None
@@ -25,22 +27,56 @@ def fetch_stock_data(stock_symbols):
 # Step 2: Calculate Bollinger %b and RSI for a single stock
 def calculate_bollinger_and_rsi(data):
     try:
-        # Calculate typical price (OHLC4)
+        # Ensure that the index is a DateTimeIndex and sorted
+        data = data.sort_index()
+        if not isinstance(data.index, pd.DatetimeIndex):
+            data.index = pd.to_datetime(data.index)
+
+        # Calculate OHLC4 for 1-hour data for RSI
         data['OHLC4'] = (data['Open'] + data['High'] + data['Low'] + data['Close']) / 4
 
-        # Calculate Bollinger Bands
-        bbands = ta.bbands(data['OHLC4'], length=20, std=2)
-        data = data.join(bbands)
+        # For Bollinger Band %b, resample data to 2-hour intervals
+        data_2h = data.resample('2h').agg({
+            'Open': 'first',
+            'High': 'max',
+            'Low': 'min',
+            'Close': 'last',
+            'OHLC4': 'mean'  # Alternatively, recalculate after resampling
+        }).dropna()
+
+        # Check if we have enough data points after resampling
+        if len(data_2h) < 20:
+            print("Not enough data after resampling to calculate Bollinger Bands")
+            return None, None
+
+        # Calculate Bollinger Bands on 2-hour data
+        bbands = ta.bbands(data_2h['OHLC4'], length=20, std=2, mamode='ema')
+        data_2h = data_2h.join(bbands)
+
+        # Check if Bollinger Bands calculation was successful
+        if bbands.isnull().all().all():
+            print("Bollinger Bands calculation failed due to insufficient data")
+            return None, None
 
         # Calculate Bollinger %b
-        data['Bollinger_%b'] = ((data['OHLC4'] - data['BBL_20_2.0']) /
-                                (data['BBU_20_2.0'] - data['BBL_20_2.0'])) * 100
+        data_2h['Bollinger_%b'] = ((data_2h['OHLC4'] - data_2h['BBL_20_2.0']) /
+                                    (data_2h['BBU_20_2.0'] - data_2h['BBL_20_2.0'])) * 100
 
-        # Calculate RSI (14 period)
+        # Use the last value of Bollinger %b
+        bollinger_b = data_2h['Bollinger_%b'].iloc[-1]
+
+        # For RSI, use the 1-hour data
         data['RSI'] = ta.rsi(data['OHLC4'], length=14)
 
-        # Return the last Bollinger %b and RSI values
-        return data['Bollinger_%b'].iloc[-1], data['RSI'].iloc[-1]
+        # Check if RSI calculation was successful
+        if data['RSI'].isnull().all():
+            print("RSI calculation failed due to insufficient data")
+            return None, None
+
+        rsi = data['RSI'].iloc[-1]
+
+        # Return both
+        return bollinger_b, rsi
 
     except Exception as e:
         print(f"Error calculating indicators: {e}")
@@ -53,10 +89,13 @@ def process_stock_data(stock_data, stock_symbols):
         try:
             data = stock_data[symbol]
             bollinger_b, rsi = calculate_bollinger_and_rsi(data)
-            results[symbol] = {
-                'Bollinger_%b': bollinger_b,
-                'RSI': rsi
-            }
+            if bollinger_b is not None and rsi is not None:
+                results[symbol] = {
+                    'Bollinger_%b': bollinger_b,
+                    'RSI': rsi
+                }
+            else:
+                print(f"Insufficient data for {symbol}, skipping...")
         except Exception as e:
             print(f"Error processing {symbol}: {e}")
     return results
@@ -66,28 +105,34 @@ def check_and_emit_alerts(results):
     for symbol, indicators in results.items():
         bollinger_b = indicators['Bollinger_%b']
         rsi = indicators['RSI']
-        print(f"Current Bollinger %b for {symbol}: {bollinger_b:.2f}%, RSI: {rsi:.2f}")
 
-        # Bollinger %b alerts
-        if bollinger_b < 0:
-            message = f"ALERT: Bollinger %b for {symbol} has dropped below 0%!"
-            socketio.emit('new_alert', {'message': message, 'type': 'alert'})
-        elif bollinger_b < 10:
-            message = f"WARNING: Bollinger %b for {symbol} is approaching 10%!"
-            socketio.emit('new_alert', {'message': message, 'type': 'warning'})
+        # Ensure that bollinger_b and rsi are not None before formatting
+        if bollinger_b is not None and rsi is not None:
+            # print(f"Current Bollinger %b for {symbol}: {bollinger_b:.2f}%, RSI: {rsi:.2f}")
 
-        # RSI alerts
-        if rsi < 30:
-            message = f"ALERT: RSI for {symbol} has dropped below 30!"
-            socketio.emit('new_alert', {'message': message, 'type': 'alert'})
-        elif rsi < 40:
-            message = f"WARNING: RSI for {symbol} is approaching 30!"
-            socketio.emit('new_alert', {'message': message, 'type': 'warning'})
+            # Bollinger %b alerts
+            if bollinger_b < 0:
+                message = f"ALERT: Bollinger %b for {symbol} has dropped below 0%!"
+                socketio.emit('new_alert', {'message': message, 'type': 'alert'})
+            elif bollinger_b > 100:
+                message = f"WARNING: Bollinger %b for {symbol} is above 100%!"
+                socketio.emit('new_alert', {'message': message, 'type': 'alert'})
+
+            # RSI alerts
+            if rsi < 10:
+                message = f"ALERT: RSI for {symbol} has dropped below 10!"
+                socketio.emit('new_alert', {'message': message, 'type': 'alert'})
+            elif rsi > 90:
+                message = f"WARNING: RSI for {symbol} is above 90!"
+                socketio.emit('new_alert', {'message': message, 'type': 'alert'})
+        else:
+            print(f"Indicators for {symbol} are None, skipping...")
 
 # Step 5: Main monitoring function
 def monitor_stock_indicators():
+    
     stock_symbols = [
-    'DEEPAKFERT.NS',
+        'DEEPAKFERT.NS',
     'MRPL.NS',
     'APOLLOTYRE.NS',
     'ASKOKLEY.NS',
@@ -300,14 +345,17 @@ def monitor_stock_indicators():
     'RAYMOND.NS',
     'SRF.NS',
     'TRENT.NS',
-]
+    ]
 
 
     while True:
         stock_data = fetch_stock_data(stock_symbols)
         if stock_data is not None and not stock_data.empty:
             results = process_stock_data(stock_data, stock_symbols)
-            check_and_emit_alerts(results)
+            if results:
+                check_and_emit_alerts(results)
+            else:
+                print("No valid indicators calculated, retrying...")
         else:
             print("No valid stock data found, retrying...")
         time.sleep(60 * 60)  # Wait for 1 hour before checking again

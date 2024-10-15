@@ -1,50 +1,55 @@
-<!-- templates/index.html -->
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <title>Bollinger Alerts</title>
-        <link
-            rel="stylesheet"
-            href="{{ url_for('static', filename='style.css') }}"
-        />
-    </head>
-    <body>
-        <h1>Bollinger %b Alerts</h1>
-        <div id="alert-container"></div>
+<head>
+    <meta charset="UTF-8" />
+    <title>Bollinger Alerts</title>
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    />
+</head>
+<body>
+    <h1>Bollinger %b Alerts</h1>
+    <div id="alert-container"></div>
 
-        <!-- Include Socket.IO library -->
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.0/socket.io.js"></script>
-        <!-- Include jQuery -->
-        <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <!-- Include Socket.IO library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.0/socket.io.js"></script>
+    <!-- Include jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 
-        <!-- Custom script for handling alerts -->
-        <script type="text/javascript">
-            $(document).ready(function () {
-                var socket = io.connect(
-                    "http://" + document.domain + ":" + location.port
+    <!-- Custom script for handling alerts -->
+    <script type="text/javascript">
+        $(document).ready(function () {
+            var socket = io.connect(
+                "http://" + document.domain + ":" + location.port
+            );
+
+            socket.on("new_alert", function (data) {
+                var alertMessage = data.message;
+                var alertType = data.type; // 'warning' or 'alert'
+
+                // Create a new alert div with a close button
+                var alertDiv = $(
+                    '<div class="alert-popup ' + alertType + '">' +
+                        '<span class="close-btn">&times;</span>' +
+                        alertMessage +
+                        "</div>"
                 );
 
-                socket.on("new_alert", function (data) {
-                    var alertMessage = data.message;
+                // Append the alert to the alert container
+                $("#alert-container").append(alertDiv);
 
-                    // Create a new alert div with a close button
-                    var alertDiv = $(
-                        '<div class="alert-popup">' +
-                            '<span class="close-btn">&times;</span>' +
-                            alertMessage +
-                            "</div>"
-                    );
-
-                    // Append the alert to the alert container
-                    $("#alert-container").append(alertDiv);
-
-                    // Add click event for the close button
-                    alertDiv.find(".close-btn").on("click", function () {
-                        $(this).parent().remove();
-                    });
+                // Add click event for the close button
+                alertDiv.find(".close-btn").on("click", function () {
+                    $(this).parent().remove();
                 });
+
+                // Automatically remove the alert after 59 minutes (3540000 milliseconds)
+                setTimeout(function () {
+                    alertDiv.remove();
+                }, 3540000);
             });
-        </script>
-    </body>
+        });
+    </script>
+</body>
 </html>
