@@ -33,7 +33,9 @@
 
                     // Create a new alert div with a close button
                     var alertDiv = $(
-                        '<div class="alert-popup ' + alertType + '">' +
+                        '<div class="alert-popup ' +
+                            alertType +
+                            '">' +
                             '<span class="close-btn">&times;</span>' +
                             alertMessage +
                             "</div>"
@@ -50,7 +52,7 @@
                     // Automatically remove the alert after 59 minutes (3540000 milliseconds)
                     setTimeout(function () {
                         alertDiv.remove();
-                    }, 3540000);
+                    }, 14 * 60 * 1000);
                 });
 
                 // Add an event listener for the refresh button
