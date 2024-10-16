@@ -39,13 +39,19 @@ body {
 }
 
 /* Styles for red alerts */
+.alert-popup.orange {
+    background-color: #f2ac08; /* Red */
+}
 .alert-popup.red {
-    background-color: #f44336; /* Red */
+    background-color: #ff1100; /* Red */
 }
 
 /* Styles for green alerts */
+.alert-popup.blue {
+    background-color: #072bf6; /* Green */
+}
 .alert-popup.green {
-    background-color: #4CAF50; /* Green */
+    background-color: #04a209; /* Green */
 }
 
 /* Add this to your static/style.css */

@@ -262,17 +262,29 @@ def check_and_emit_alerts(results):
             # Bollinger %b alerts
             if bollinger_b < 0:
                 message = f"ALERT: Bollinger %b for {symbol} has dropped below 0%!"
+                socketio.emit('new_alert', {'message': message, 'type': 'blue'})
+            elif bollinger_b < -10:
+                message = f"ALERT: Bollinger %b for {symbol} has dropped below -10%!"
                 socketio.emit('new_alert', {'message': message, 'type': 'green'})
             elif bollinger_b > 100:
                 message = f"ALERT: Bollinger %b for {symbol} is above 100%!"
+                socketio.emit('new_alert', {'message': message, 'type': 'orange'})
+            elif bollinger_b > 120:
+                message = f"ALERT: Bollinger %b for {symbol} is above 120%!"
                 socketio.emit('new_alert', {'message': message, 'type': 'red'})
 
             # RSI alerts
             if rsi < 10:
                 message = f"ALERT: RSI for {symbol} has dropped below 10!"
+                socketio.emit('new_alert', {'message': message, 'type': 'blue'})
+            elif rsi < 5:
+                message = f"ALERT: RSI for {symbol} has dropped below 5!"
                 socketio.emit('new_alert', {'message': message, 'type': 'green'})
             elif rsi > 90:
                 message = f"ALERT: RSI for {symbol} is above 90!"
+                socketio.emit('new_alert', {'message': message, 'type': 'orange'})
+            elif rsi > 95:
+                message = f"ALERT: RSI for {symbol} is above 95!"
                 socketio.emit('new_alert', {'message': message, 'type': 'red'})
         else:
             print(f"Indicators for {symbol} are None, skipping...")
