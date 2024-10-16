@@ -29,13 +29,11 @@
                 // Handle new alerts from the server
                 socket.on("new_alert", function (data) {
                     var alertMessage = data.message;
-                    var alertType = data.type; // 'warning' or 'alert'
+                    var alertType = data.type; // 'green' or 'red'
 
                     // Create a new alert div with a close button
                     var alertDiv = $(
-                        '<div class="alert-popup ' +
-                            alertType +
-                            '">' +
+                        '<div class="alert-popup ' + alertType + '">' +
                             '<span class="close-btn">&times;</span>' +
                             alertMessage +
                             "</div>"

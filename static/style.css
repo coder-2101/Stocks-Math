@@ -10,7 +10,6 @@ body {
 }
 
 .alert-popup {
-    background-color: #f44336; /* Red */
     color: white;
     padding: 15px;
     margin-top: 10px;
@@ -38,6 +37,17 @@ body {
 .close-btn:hover {
     color: #bbb;
 }
+
+/* Styles for red alerts */
+.alert-popup.red {
+    background-color: #f44336; /* Red */
+}
+
+/* Styles for green alerts */
+.alert-popup.green {
+    background-color: #4CAF50; /* Green */
+}
+
 /* Add this to your static/style.css */
 #refresh-btn {
     padding: 10px 20px;
