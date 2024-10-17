@@ -225,9 +225,12 @@ def calculate_bollinger_and_rsi(data):
             return None, None
 
         rsi = data['RSI'].iloc[-1]
+        
+        # Get the most recent close price
+        value = data['Close'].iloc[-1]
 
         # Return both
-        return bollinger_b, rsi
+        return bollinger_b, rsi, value
 
     except Exception as e:
         print(f"Error calculating indicators: {e}")
@@ -239,11 +242,12 @@ def process_stock_data(stock_data, stock_symbols):
     for symbol in stock_symbols:
         try:
             data = stock_data[symbol]
-            bollinger_b, rsi = calculate_bollinger_and_rsi(data)
+            bollinger_b, rsi, value = calculate_bollinger_and_rsi(data)
             if bollinger_b is not None and rsi is not None:
                 results[symbol] = {
                     'Bollinger_%b': bollinger_b,
-                    'RSI': rsi
+                    'RSI': rsi,
+                    'Value': value,
                 }
             else:
                 print(f"Insufficient data for {symbol}, skipping...")
@@ -256,35 +260,36 @@ def check_and_emit_alerts(results):
     for symbol, indicators in results.items():
         bollinger_b = indicators['Bollinger_%b']
         rsi = indicators['RSI']
+        value = indicators['Value']
 
         # Ensure that bollinger_b and rsi are not None before formatting
         if bollinger_b is not None and rsi is not None:
             # Bollinger %b alerts
             if bollinger_b < -10:
-                message = f"ALERT: Bollinger %b for {symbol} has dropped below -10%! | %b: {bollinger_b:.2f} | RSI: {rsi:.2f}"
+                message = f"ALERT: Bollinger %b for {symbol} has dropped below -10%! | %b: {bollinger_b:.2f} | RSI: {rsi:.2f} | Value: {value:.2f}"
                 socketio.emit('new_alert', {'message': message, 'type': 'green'})
             elif bollinger_b < 0:
-                message = f"ALERT: Bollinger %b for {symbol} has dropped below 0%! | %b: {bollinger_b:.2f} | RSI: {rsi:.2f}"
+                message = f"ALERT: Bollinger %b for {symbol} has dropped below 0%! | %b: {bollinger_b:.2f} | RSI: {rsi:.2f} | Value: {value:.2f}"
                 socketio.emit('new_alert', {'message': message, 'type': 'blue'})
             elif bollinger_b > 120:
-                message = f"ALERT: Bollinger %b for {symbol} is above 120%! | %b: {bollinger_b:.2f} | RSI: {rsi:.2f}"
+                message = f"ALERT: Bollinger %b for {symbol} is above 120%! | %b: {bollinger_b:.2f} | RSI: {rsi:.2f} | Value: {value:.2f}"
                 socketio.emit('new_alert', {'message': message, 'type': 'red'})
             elif bollinger_b > 100:
-                message = f"ALERT: Bollinger %b for {symbol} is above 100%! | %b: {bollinger_b:.2f} | RSI: {rsi:.2f}"
+                message = f"ALERT: Bollinger %b for {symbol} is above 100%! | %b: {bollinger_b:.2f} | RSI: {rsi:.2f} | Value: {value:.2f}"
                 socketio.emit('new_alert', {'message': message, 'type': 'orange'})
 
             # RSI alerts
             if rsi < 5:
-                message = f"ALERT: RSI for {symbol} has dropped below 5! | %b: {bollinger_b:.2f} | RSI: {rsi:.2f}"
+                message = f"ALERT: RSI for {symbol} has dropped below 5! | %b: {bollinger_b:.2f} | RSI: {rsi:.2f} | Value: {value:.2f}"
                 socketio.emit('new_alert', {'message': message, 'type': 'green'})
             elif rsi < 10:
-                message = f"ALERT: RSI for {symbol} has dropped below 10! | %b: {bollinger_b:.2f} | RSI: {rsi:.2f}"
+                message = f"ALERT: RSI for {symbol} has dropped below 10! | %b: {bollinger_b:.2f} | RSI: {rsi:.2f} | Value: {value:.2f}"
                 socketio.emit('new_alert', {'message': message, 'type': 'blue'})
             elif rsi > 95:
-                message = f"ALERT: RSI for {symbol} is above 95! | %b: {bollinger_b:.2f} | RSI: {rsi:.2f}"
+                message = f"ALERT: RSI for {symbol} is above 95! | %b: {bollinger_b:.2f} | RSI: {rsi:.2f} | Value: {value:.2f}"
                 socketio.emit('new_alert', {'message': message, 'type': 'red'})
             elif rsi > 90:
-                message = f"ALERT: RSI for {symbol} is above 90! | %b: {bollinger_b:.2f} | RSI: {rsi:.2f}"
+                message = f"ALERT: RSI for {symbol} is above 90! | %b: {bollinger_b:.2f} | RSI: {rsi:.2f} | Value: {value:.2f}"
                 socketio.emit('new_alert', {'message': message, 'type': 'orange'})
         else:
             print(f"Indicators for {symbol} are None, skipping...")
