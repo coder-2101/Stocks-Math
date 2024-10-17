@@ -24,8 +24,6 @@ h1 {
 }
 
 .alert-popup {
-    background-color: #34495e;
-    border-left: 5px solid #3498db;
     padding: 15px;
     margin-bottom: 10px;
     position: relative;
@@ -33,28 +31,28 @@ h1 {
 }
 
 .alert-popup.green {
-    border-color: #2ecc71;
+    background-color: #2ecc71;
 }
 
 .alert-popup.blue {
-    border-color: #3498db;
+    background-color: #3498db;
 }
 
 .alert-popup.orange {
-    border-color: #e67e22;
+    background-color: #e67e22;
 }
 
 .alert-popup.red {
-    border-color: #e74c3c;
+    background-color: #e74c3c;
 }
 
 .close-btn {
     position: absolute;
-    top: 10px;
-    right: 15px;
+    top: 0px;
+    right: 8px;
     cursor: pointer;
     color: #ecf0f1;
-    font-size: 18px;
+    font-size: 36px;
 }
 
 .alert-table {
