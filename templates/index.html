@@ -90,44 +90,44 @@
                         formatNumber(day_low) +
                         "</p>";
 
-                    alertContent += '<table class="alert-table">';
-                    alertContent += "<tr><th>Metrics</th>";
+                    // alertContent += '<table class="alert-table">';
+                    // alertContent += "<tr><th>Metrics</th>";
 
-                    periods.forEach(function (period) {
-                        alertContent += "<th>" + period + "</th>";
-                    });
+                    // periods.forEach(function (period) {
+                    //     alertContent += "<th>" + period + "</th>";
+                    // });
 
-                    alertContent += "</tr>";
+                    // alertContent += "</tr>";
 
-                    // Value change
-                    alertContent += "<tr><td>Value change</td>";
-                    value_changes.forEach(function (val) {
-                        alertContent += "<td>" + formatNumber(val) + "</td>";
-                    });
-                    alertContent += "</tr>";
+                    // // Value change
+                    // alertContent += "<tr><td>Value change</td>";
+                    // value_changes.forEach(function (val) {
+                    //     alertContent += "<td>" + formatNumber(val) + "</td>";
+                    // });
+                    // alertContent += "</tr>";
 
-                    // % change
-                    alertContent += "<tr><td>% change</td>";
-                    percent_changes.forEach(function (val) {
-                        alertContent += "<td>" + formatNumber(val) + "%</td>";
-                    });
-                    alertContent += "</tr>";
+                    // // % change
+                    // alertContent += "<tr><td>% change</td>";
+                    // percent_changes.forEach(function (val) {
+                    //     alertContent += "<td>" + formatNumber(val) + "%</td>";
+                    // });
+                    // alertContent += "</tr>";
 
-                    // High
-                    alertContent += "<tr><td>High</td>";
-                    highs.forEach(function (val) {
-                        alertContent += "<td>" + formatNumber(val) + "</td>";
-                    });
-                    alertContent += "</tr>";
+                    // // High
+                    // alertContent += "<tr><td>High</td>";
+                    // highs.forEach(function (val) {
+                    //     alertContent += "<td>" + formatNumber(val) + "</td>";
+                    // });
+                    // alertContent += "</tr>";
 
-                    // Low
-                    alertContent += "<tr><td>Low</td>";
-                    lows.forEach(function (val) {
-                        alertContent += "<td>" + formatNumber(val) + "</td>";
-                    });
-                    alertContent += "</tr>";
+                    // // Low
+                    // alertContent += "<tr><td>Low</td>";
+                    // lows.forEach(function (val) {
+                    //     alertContent += "<td>" + formatNumber(val) + "</td>";
+                    // });
+                    // alertContent += "</tr>";
 
-                    alertContent += "</table>";
+                    // alertContent += "</table>";
 
                     // Create a new alert div with a close button
                     var alertDiv = $(
