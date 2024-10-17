@@ -2,7 +2,7 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
-        <title>Bollinger Alerts</title>
+        <title>Bollinger %b Alerts</title>
         <link
             rel="stylesheet"
             href="{{ url_for('static', filename='style.css') }}"
@@ -26,10 +26,108 @@
                     "http://" + document.domain + ":" + location.port
                 );
 
+                // Function to format numbers safely
+                function formatNumber(value, decimals = 2) {
+                    if (value === undefined || value === null || isNaN(value)) {
+                        return "--";
+                    } else {
+                        return parseFloat(value).toFixed(decimals);
+                    }
+                }
+
                 // Handle new alerts from the server
                 socket.on("new_alert", function (data) {
-                    var alertMessage = data.message;
-                    var alertType = data.type; // 'green' or 'red'
+                    var alertType = data.type;
+                    var symbol = data.symbol;
+                    var value = data.Value;
+                    var rsi = data.RSI;
+                    var bollinger_b = data["Bollinger_%b"];
+
+                    // Day's High and Low
+                    var day_change = data["Value change (1 day)"];
+                    var day_change_percent = data["% change (1 day)"];
+                    var day_high = data["Day High"];
+                    var day_low = data["Day Low"];
+
+                    // Value changes and percentage changes for periods
+                    var periods = ["5 days", "20 days", "1 year"];
+
+                    var value_changes = [];
+                    var percent_changes = [];
+                    var highs = [];
+                    var lows = [];
+
+                    periods.forEach(function (period) {
+                        value_changes.push(
+                            data["Value change (" + period + ")"]
+                        );
+                        percent_changes.push(data["% change (" + period + ")"]);
+                        highs.push(data["High (" + period + " ago)"]);
+                        lows.push(data["Low (" + period + " ago)"]);
+                    });
+
+                    // Build the alert content
+                    var alertContent =
+                        "<strong>" +
+                        symbol +
+                        " (Value: " +
+                        formatNumber(value) +
+                        ", RSI: " +
+                        formatNumber(rsi) +
+                        ", %B: " +
+                        formatNumber(bollinger_b) +
+                        ")</strong><br>";
+
+                    alertContent +=
+                        "<p>Change: " +
+                        formatNumber(day_change) +
+                        " | " +
+                        formatNumber(day_change_percent) +
+                        " % | " +
+                        ", High: " +
+                        formatNumber(day_high) +
+                        ", Low: " +
+                        formatNumber(day_low) +
+                        "</p>";
+
+                    alertContent += '<table class="alert-table">';
+                    alertContent += "<tr><th>Metrics</th>";
+
+                    periods.forEach(function (period) {
+                        alertContent += "<th>" + period + "</th>";
+                    });
+
+                    alertContent += "</tr>";
+
+                    // Value change
+                    alertContent += "<tr><td>Value change</td>";
+                    value_changes.forEach(function (val) {
+                        alertContent += "<td>" + formatNumber(val) + "</td>";
+                    });
+                    alertContent += "</tr>";
+
+                    // % change
+                    alertContent += "<tr><td>% change</td>";
+                    percent_changes.forEach(function (val) {
+                        alertContent += "<td>" + formatNumber(val) + "%</td>";
+                    });
+                    alertContent += "</tr>";
+
+                    // High
+                    alertContent += "<tr><td>High</td>";
+                    highs.forEach(function (val) {
+                        alertContent += "<td>" + formatNumber(val) + "</td>";
+                    });
+                    alertContent += "</tr>";
+
+                    // Low
+                    alertContent += "<tr><td>Low</td>";
+                    lows.forEach(function (val) {
+                        alertContent += "<td>" + formatNumber(val) + "</td>";
+                    });
+                    alertContent += "</tr>";
+
+                    alertContent += "</table>";
 
                     // Create a new alert div with a close button
                     var alertDiv = $(
@@ -37,7 +135,7 @@
                             alertType +
                             '">' +
                             '<span class="close-btn">&times;</span>' +
-                            alertMessage +
+                            alertContent +
                             "</div>"
                     );
 
@@ -49,7 +147,7 @@
                         $(this).parent().remove();
                     });
 
-                    // Automatically remove the alert after 59 minutes (3540000 milliseconds)
+                    // Automatically remove the alert after 14 minutes
                     setTimeout(function () {
                         alertDiv.remove();
                     }, 14 * 60 * 1000);
