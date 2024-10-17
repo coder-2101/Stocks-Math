@@ -31,19 +31,19 @@ h1 {
 }
 
 .alert-popup.green {
-    background-color: #2ecc71;
+    background-color: #007e34;
 }
 
 .alert-popup.blue {
-    background-color: #3498db;
+    background-color: #016fb9;
 }
 
 .alert-popup.orange {
-    background-color: #e67e22;
+    background-color: #b85600;
 }
 
 .alert-popup.red {
-    background-color: #e74c3c;
+    background-color: #dc1600;
 }
 
 .close-btn {
