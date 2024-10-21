@@ -14,114 +14,114 @@ app.config['SECRET_KEY'] = 'your_secret_key'
 socketio = SocketIO(app)
 
 stock_symbols = [
-    'DEEPAKFERT.NS',
-    'MRPL.NS',
-    'APOLLOTYRE.NS',
-    'ASHOKLEY.NS',
-    'BAJAJ-AUTO.NS',
-    'BHARATFORG.NS',
-    'EICHERMOT.NS',
-    'HEROMOTOCO.NS',
-    'M&M.NS',
-    'MARUTI.NS',
-    'MRF.NS',
-    'TATAMOTORS.NS',
-    'TVSMOTOR.NS',
-    'AXISBANK.NS',
-    'BANKBARODA.NS',
-    'CANBK.NS',
-    'HDFCBANK.NS',
-    'ICICIBANK.NS',
-    'INDUSINDBK.NS',
-    'KOTAKBANK.NS',
-    'SBIN.NS',
+    'AARTIIND.NS',
     'ABB.NS',
-    'ASTRAL.NS',
-    'BEL.NS',
-    'BEML.NS',
-    'BHEL.NS',
-    'CROMPTON.NS',
-    'CUMMINSIND.NS',
-    'HAL.NS',
-    'HAVELLS.NS',
-    'LT.NS',
-    'POLYCAB.NS',
-    'SIEMENS.NS',
-    'VOLTAS.NS',
     'ACC.NS',
     'AMBUJACEM.NS',
-    'DALBHARAT.NS',
-    'GRASIM.NS',
-    'INDIACEM.NS',
-    'JKCEMENT.NS',
-    'RAMCOCEM.NS',
-    'STARCEMENT.NS',
-    'AARTIIND.NS',
-    'CHAMBLFERT.NS',
-    'DEEPAKNTR.NS',
-    'PIDILITIND.NS',
-    'TATACHEM.NS',
-    'UPL.NS',
+    'APLAPOLLO.NS',
+    'APOLLOTYRE.NS',
+    'ASHOKLEY.NS',
     'ASIANPAINT.NS',
+    'ASTRAL.NS',
+    'AUROPHARMA.NS',
+    'AXISBANK.NS',
+    'BAJAJ-AUTO.NS',
+    'BANKBARODA.NS',
     'BATAINDIA.NS',
+    'BEL.NS',
+    'BEML.NS',
     'BERGEPAINT.NS',
+    'BHARATFORG.NS',
+    'BHARTIARTL.NS',
+    'BHEL.NS',
     'BRITANNIA.NS',
+    'CANBK.NS',
+    'CHAMBLFERT.NS',
+    'CIPLA.NS',
+    'COALINDIA.NS',
+    'CONCOR.NS',
+    'CUMMINSIND.NS',
     'DABUR.NS',
+    'DALBHARAT.NS',
+    'DEEPAKFERT.NS',
+    'DEVYANI.NS',
+    'EICHERMOT.NS',
+    'FSL.NS',
     'GODFRYPHLP.NS',
     'GODREJCP.NS',
-    'HINDUNILVR.NS',
-    'INDIAMART.NS',
-    'ITC.NS',
-    'MARICO.NS',
-    'SIRCA.NS',
-    'TATACONSUM.NS',
-    'TITAN.NS',
-    'UBL.NS',
-    'ADANIPORTS.NS',
-    'CONCOR.NS',
-    'APOLLO.NS',
-    'BSOFT.NS',
-    'FSL.NS',
+    'GRASIM.NS',
+    'GRSE.NS',
+    'HAL.NS',
+    'HAVELLS.NS',
     'HCLTECH.NS',
-    'INFY.NS',
-    'INTELLECT.NS',
-    'KPITTECH.NS',
-    'LTIM.NS',
-    'TATAELXSI.NS',
-    'TCS.NS',
-    'TECHM.NS',
-    'WIPRO.NS',
-    'ZENTEC.NS',
-    'APLAPOLLO.NS',
-    'COALINDIA.NS',
+    'HDFCBANK.NS',
+    'HEROMOTOCO.NS',
     'HINDALCO.NS',
     'HINDCOPPER.NS',
+    'HINDUNILVR.NS',
     'HINDZINC.NS',
+    'ICICIBANK.NS',
+    'IEX.NS',
+    'INDIACEM.NS',
+    'INDIAMART.NS',
+    'INDUSINDBK.NS',
+    'INFY.NS',
+    'INTELLECT.NS',
+    'ITC.NS',
     'JINDALSTEL.NS',
+    'JIOFIN.NS',
+    'JKCEMENT.NS',
     'JSWSTEEL.NS',
+    'KOTAKBANK.NS',
+    'KPITTECH.NS',
+    'LT.NS',
+    'LTIM.NS',
+    'M&M.NS',
+    'MARICO.NS',
+    'MARUTI.NS',
+    'MPHASIS.NS',
+    'MRF.NS',
     'NATIONALUM.NS',
+    'NESTLEIND.NS',
     'NMDC.NS',
-    'SAIL.NS',
-    'TATASTEEL.NS',
-    'VEDL.NS',
-    'ONGC.NS',
-    'RELIANCE.NS',
-    'DEVYANI.NS',
-    'GRSE.NS',
+    'NTPC.NS',
     'NYKAA.NS',
+    'ONGC.NS',
+    'PIDILITIND.NS',
+    'POLYCAB.NS',
     'POLYPLEX.NS',
+    'POWERGRID.NS',
+    'RAMCOCEM.NS',
+    'RAYMOND.NS',
+    'RELIANCE.NS',
     'RENUKA.NS',
+    'SAIL.NS',
+    'SBIN.NS',
+    'SIEMENS.NS',
+    'SIRCA.NS',
+    'SRF.NS',
+    'STARCEMENT.NS',
+    'SUNPHARMA.NS',
+    'TATACHEM.NS',
+    'TATACONSUM.NS',
+    'TATAELXSI.NS',
+    'TATAMOTORS.NS',
+    'TATAPOWER.NS',
+    'TATASTEEL.NS',
+    'TATATECH.NS',
+    'TCS.NS',
+    'TECHM.NS',
+    'TITAN.NS',
     'TRITURBINE.NS',
     'TTKPRESTIG.NS',
+    'TVSMOTOR.NS',
+    'UBL.NS',
+    'UPL.NS',
+    'VEDL.NS',
+    'VOLTAS.NS',
+    'WIPRO.NS',
+    'ZENTEC.NS',
     'ZOMATO.NS',
-    'IEX.NS',
-    'NTPC.NS',
-    'POWERGRID.NS',
-    'TATAPOWER.NS',
-    'BHARTIARTL.NS',
-    'JIOFIN.NS',
-    'RAYMOND.NS',
-    'SRF.NS',
     ]
 
 
@@ -129,6 +129,8 @@ stock_symbols = [
 # Step 1: Fetch Stock Data
 def fetch_stock_data(stock_symbols):
     try:
+        fetch_time = datetime.now().strftime('%I:%M %p')
+
         # Fetch 1-hour data over 3 months for existing indicators
         stock_data_1h = yf.download(stock_symbols, period="3mo", interval="1h", group_by='ticker', threads=True)
         # Fetch daily data over 2 years for additional metrics
@@ -148,7 +150,7 @@ def fetch_stock_data(stock_symbols):
         if stock_data_1h.empty or stock_data_daily.empty or stock_data_minute.empty:
             print(f"Error: No data returned for symbols {stock_symbols}")
             return None, None, None
-        return stock_data_1h, stock_data_daily, stock_data_minute
+        return fetch_time, stock_data_1h, stock_data_daily, stock_data_minute
     except Exception as e:
         print(f"Error fetching stock data: {e}")
         return None, None, None
@@ -163,11 +165,12 @@ def calculate_bollinger_and_rsi(data_1h, data_daily, data_minute):
     
         # RSI on 1-hour data
         data_1h['OHLC4'] = data_1h[['Open', 'High', 'Low', 'Close']].mean(axis=1)
-        data_1h['RSI'] = ta.rsi(data_1h['OHLC4'], length=14)
+        data_1h['RSI'] = ta.rsi(data_1h['OHLC4'], length=20)
         rsi_current = data_1h['RSI'].iloc[-1]
     
         # Bollinger Bands on 2-hour data
-        data_2h = data_1h.resample('2h').agg({
+        # we are just testing for 1h now, can be removed in the future
+        data_2h = data_1h.resample('1h').agg({
             'Open': 'first',
             'High': 'max',
             'Low': 'min',
@@ -179,10 +182,10 @@ def calculate_bollinger_and_rsi(data_1h, data_daily, data_minute):
             print("Not enough data after resampling to calculate Bollinger Bands")
             return None, None, None, None
     
-        bbands = ta.bbands(data_2h['OHLC4'], length=20, std=2, mamode='ema')
+        bbands = ta.bbands(data_2h['OHLC4'], length=26, std=2, mamode='ema')
         data_2h = data_2h.join(bbands)
-        data_2h['Bollinger_%b'] = ((data_2h['OHLC4'] - data_2h['BBL_20_2.0']) /
-                                    (data_2h['BBU_20_2.0'] - data_2h['BBL_20_2.0'])) * 100
+        data_2h['Bollinger_%b'] = ((data_2h['OHLC4'] - data_2h['BBL_26_2.0']) /
+                                    (data_2h['BBU_26_2.0'] - data_2h['BBL_26_2.0'])) * 100
         bollinger_b = data_2h['Bollinger_%b'].iloc[-1]
     
         # Current value
@@ -239,7 +242,7 @@ def process_stock_data(stock_data_1h, stock_data_daily, stock_data_minute, stock
                     'Bollinger_%b': bollinger_b,
                     'RSI': rsi,
                     'Value': value,
-                    **additional_metrics  # Additional metrics including day's high and low
+                    **additional_metrics  # Additional metrics incfluding day's high and low
                 }
             else:
                 print(f"Insufficient data for {symbol}, skipping...")
@@ -248,7 +251,7 @@ def process_stock_data(stock_data_1h, stock_data_daily, stock_data_minute, stock
     return results
 
 # Step 4: Emit alerts based on conditions
-def check_and_emit_alerts(results):
+def check_and_emit_alerts(results, time):
     import math
     from datetime import datetime
 
@@ -285,6 +288,7 @@ def check_and_emit_alerts(results):
                 'Bollinger_%b': bollinger_b,
                 'RSI': rsi,
                 'Value': value,
+                'time': str(time),
                 **additional_metrics
             }
 
@@ -333,12 +337,12 @@ data_processing_lock = threading.Lock()
 def monitor_stock_indicators():
     while True:
         with data_processing_lock:
-            stock_data_1h, stock_data_daily, stock_data_minute = fetch_stock_data(stock_symbols)
+            fetch_time, stock_data_1h, stock_data_daily, stock_data_minute = fetch_stock_data(stock_symbols)
             if (stock_data_1h is not None and not stock_data_1h.empty and
                 stock_data_daily is not None and not stock_data_daily.empty):
                 results = process_stock_data(stock_data_1h, stock_data_daily, stock_data_minute, stock_symbols)
                 if results:
-                    check_and_emit_alerts(results)
+                    check_and_emit_alerts(results, fetch_time)
                 else:
                     print("No valid indicators calculated, retrying...")
             else:
@@ -350,12 +354,13 @@ def handle_refresh_request():
     with data_processing_lock:
         try:
             print("Received refresh request from client.")
-            stock_data_1h, stock_data_daily, stock_data_minute = fetch_stock_data(stock_symbols)
+            fetch_time, stock_data_1h, stock_data_daily, stock_data_minute = fetch_stock_data(stock_symbols)
             if (stock_data_1h is not None and not stock_data_1h.empty and
                 stock_data_daily is not None and not stock_data_daily.empty):
                 results = process_stock_data(stock_data_1h, stock_data_daily, stock_data_minute, stock_symbols)
                 if results:
-                    check_and_emit_alerts(results)
+                    results['time'] = fetch_time
+                    check_and_emit_alerts(results, fetch_time)
                     emit('refresh_complete', {'status': 'success'})
                 else:
                     print("No valid indicators calculated.")

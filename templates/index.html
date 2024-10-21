@@ -2,14 +2,14 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
-        <title>Bollinger %b Alerts</title>
+        <title>Bollinger %b Alerts (study:ema | period:26 | 1H)</title>
         <link
             rel="stylesheet"
             href="{{ url_for('static', filename='style.css') }}"
         />
     </head>
     <body>
-        <h1>Bollinger %b Alerts</h1>
+        <h1>Bollinger %b Alerts (study:ema | period:26 | 1H)</h1>
         <!-- Add the Refresh Button -->
         <button id="refresh-btn">Refresh</button>
         <div id="alert-container"></div>
@@ -41,6 +41,7 @@
                     var symbol = data.symbol;
                     var value = data.Value;
                     var rsi = data.RSI;
+                    var time = data.time;
                     var bollinger_b = data["Bollinger_%b"];
 
                     // Day's High and Low
@@ -76,6 +77,8 @@
                         formatNumber(rsi) +
                         ", %B: " +
                         formatNumber(bollinger_b) +
+                        ") @ " +
+                            time
                         ")</strong><br>";
 
                     alertContent +=
