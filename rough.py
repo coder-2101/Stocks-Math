@@ -1,8 +1,5 @@
-import yfinance as yf
+from datetime import datetime
 
-# Get Nifty 50 data
-nifty50 = yf.Ticker("^NSEI")
-
-# Fetch historical market data
-hist = nifty50.history(period="1mo")
-print(hist)
+fetch_time = datetime.now().strftime('%I:%M %p')
+print(fetch_time
+)
