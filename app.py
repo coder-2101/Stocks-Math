@@ -359,7 +359,6 @@ def handle_refresh_request():
                 stock_data_daily is not None and not stock_data_daily.empty):
                 results = process_stock_data(stock_data_1h, stock_data_daily, stock_data_minute, stock_symbols)
                 if results:
-                    results['time'] = fetch_time
                     check_and_emit_alerts(results, fetch_time)
                     emit('refresh_complete', {'status': 'success'})
                 else:
